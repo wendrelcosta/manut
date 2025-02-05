@@ -7,6 +7,23 @@ include 'header.php';
 $sql = "SELECT * FROM material_carga";
 $stmt = $conn->query($sql);
 $materiais = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+//Verificação de busca
+if (isset($_GET['busca'])) {
+$termoBusca = $_GET['busca'];
+
+// montando consulta SQL com filtro
+$sql = "SELECT * FROM material_carga WHERE
+nome_carga LIKE :termo OR
+bmp LIKE :termo OR
+modelo LIKE :termo OR
+setor LIKE :termo OR
+militar_responsavel :termo";
+
+$stmt = $conn->prepare($sql);
+$stmt->bindValue(':termo', "%$termoBusca%");
+$stmt->execute();
+$materiais = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -73,11 +90,26 @@ $materiais = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .descarregado {
             background-color: #FFC0CB;
         }
+       
+        .busca-container {
+            padding: 25px 0;
+            
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+         <div class="busca-container">
+<forma melhor="GET">
+               <div class="input-group">
+                    <input type="text" class="form-control" name="busca" placeholder="Buscar por nome" valeu="<php echo isset($termoBusca) ? $termoBusca : ''; ?>">
+         <div class="input-group-append">
+           <Button class="btn btn-primary" type="submit">Buscar</Button>
+            </div>
+           </div>
+         </form>
+        </div>
         <h2>Listagem de Materiais</h2>
         <div class="table-responsive">
             <table class="table table-bordered">
